@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  api:
+    build: 
+      context: ./currency-converter-api
+      dockerfile: prod.Dockerfile
+    container_name: currency-coverter-api
+    restart: always
+    environment:
+      PORT: 3000
+    ports:
+      - "3000:3000"
+    healthcheck:
+      test: ["CMD-SHELL", ""]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    command: ["node", "dist/server.js"]
+
+  ui:
+    build:
+      context: ./currency-converter-ui
+      dockerfile: prod.Dockerfile
+    container_name: currency-coverter-ui
+    restart: always
+    volumes:
+      - ./currency-converter-ui/app:/app/src
+      - ./currency-converter-ui/public:/app/public
+    depends_on:
+      api:
+        condition: service_healthy
+    ports:
+      - "3000:3000"
+    links:
+      - api
+    command: ["node", "dist/server.js"]
+
+
