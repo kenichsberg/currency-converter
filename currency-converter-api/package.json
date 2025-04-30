@@ -5,7 +5,7 @@
   "main": "server.js",
   "scripts": {
     "build": "tsc",
-    "dev": "ts-node src/server.ts",
+    "dev": "tsx src/server.ts",
     "lint": "eslint . --ext .ts",
     "format": "prettier --write .",
     "test": "NODE_ENV=test jest --detectOpenHandles"
@@ -33,11 +33,11 @@
     "prettier": "^3.5.3",
     "supertest": "^7.1.0",
     "ts-jest": "^29.3.0",
-    "ts-node": "^10.9.2",
     "tsx": "^4.19.3",
     "typescript": "^5.8.2"
   },
   "dependencies": {
+    "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2"
   },

@@ -1,0 +1,16 @@
+{
+  "name": "currency-converter",
+  "version": "1.0.0",
+  "scripts": {
+    "api:init": "cd currency-converter-api && npm ci",
+    "ui:init": "cd currency-converter-ui && npm ci",
+    "initialize": "npm run api:init & npm run ui:init",
+    "api:dev": "cd currency-converter-api && npm run dev",
+    "ui:dev": "cd currency-converter-ui && npm run dev",
+    "dev": "npm run api:dev & npm run ui:dev"
+  },
+  "volta": {
+    "node": "22.14.0",
+    "npm": "11.2.0"
+  }
+}

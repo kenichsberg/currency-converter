@@ -10,12 +10,20 @@ const SWOP_BASE_URL = 'https://swop.cx/rest'
 const swopHeaders = new Headers()
 swopHeaders.append('Authorization', `ApiKey ${process.env.SWOP_API_KEY}`)
 
-const getJSON = <T>(config: {
+type swopRes = {
+  base_currency: string
+  quote_currency: string
+  quote: number
+  date: string
+}
+
+// TODO apply fetcher style
+async function getJSON<T>(config: {
   url: string
   method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'
   headers: Headers
-}): Promise<T> => {
-  const fetchConfig = { method: 'GET', headers: config.headers }
+}): Promise<T> {
+  const fetchConfig = { method: config.method, headers: config.headers }
   return fetch(config.url, fetchConfig).then<T>((response) => response.json())
 }
 
@@ -23,7 +31,7 @@ router.get('/convert/:from/:to/:amount', async (req, res, next) => {
   const amount = parseFloat(req.params.amount)
   if (isNaN(amount)) return res.send(400)
 
-  let swopRes = await getJSON<{ quote: number }>({
+  let swopRes = await getJSON<swopRes>({
     url: `${SWOP_BASE_URL}/rates/${req.params.from}/${req.params.to}`,
     method: 'GET',
     headers: swopHeaders,
@@ -35,7 +43,14 @@ router.get('/convert/:from/:to/:amount', async (req, res, next) => {
   console.log(typeof rate)
   if (typeof rate !== 'number') return res.send(400)
 
-  return res.json({ converted: amount * rate })
+  return res.json({
+    fromCurrency: swopRes.base_currency,
+    toCurrency: swopRes.quote_currency,
+    rate: swopRes.quote,
+    date: swopRes.date,
+    fromAmount: amount,
+    toAmount: amount * rate,
+  })
 })
 
 export { router }
