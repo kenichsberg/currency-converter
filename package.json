@@ -1,16 +1,23 @@
 {
   "name": "currency-converter",
   "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "shared"
+  ],
   "scripts": {
-    "api:init": "cd currency-converter-api && npm ci",
-    "ui:init": "cd currency-converter-ui && npm ci",
-    "initialize": "npm run api:init & npm run ui:init",
-    "api:dev": "cd currency-converter-api && npm run dev",
-    "ui:dev": "cd currency-converter-ui && npm run dev",
-    "dev": "npm run api:dev & npm run ui:dev"
+    "init:backend": "cd backend && npm ci",
+    "init:frontend": "cd frontend && npm ci",
+    "init-all": "run-p init:*",
+    "dev:backend": "cd backend && npm run dev",
+    "dev:frontend": "cd frontend && npm run dev",
+    "dev": "run-p dev:*"
   },
   "volta": {
     "node": "22.14.0",
     "npm": "11.2.0"
+  },
+  "devDependencies": {
+    "npm-run-all": "^4.1.5"
   }
 }
