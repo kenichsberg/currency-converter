@@ -1,8 +1,8 @@
 'use client'
-import { useState } from 'react'
+import { JSX, useState } from 'react'
 import ConversionResult from '@/app/conversion-result'
 
-export default function Form() {
+export default function Form(): JSX.Element {
   const [amount, setAmount] = useState<number>(1)
   const [fromCurrency, setFromCurrency] = useState<string>('EUR')
   const [toCurrency, setToCurrency] = useState<string>('USD')

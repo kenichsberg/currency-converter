@@ -3,13 +3,14 @@
   "version": "1.0.0",
   "private": true,
   "workspaces": [
-    "shared"
+    "common"
   ],
   "scripts": {
     "init:backend": "cd backend && npm ci",
     "init:frontend": "cd frontend && npm ci",
-    "init-all": "run-p init:*",
-    "dev:backend": "cd backend && npm run dev",
+    "init:shared": "cd shared && npm ci",
+    "init-all": "npm ci && run-p init:*",
+    "dev:backend": "cd backend && npm run build && npm run start",
     "dev:frontend": "cd frontend && npm run dev",
     "dev": "run-p dev:*"
   },
