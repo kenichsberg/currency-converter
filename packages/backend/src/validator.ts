@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express'
 import z from 'zod'
-import { StrictZodObject, parseWithSchema } from 'common'
+import { StrictZodObject, parseWithSchema } from 'common/dist/index.js'
 
 type Schema<
   Query extends StrictZodObject,

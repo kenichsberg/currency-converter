@@ -2,7 +2,7 @@ import { Router, Request, Response } from 'express'
 import dotenv from 'dotenv'
 import z from 'zod'
 import { validateRoute } from './validator.js'
-import { CURRENCY_CODES } from 'common'
+import { CURRENCY_CODES } from 'common/dist/index.js'
 
 const envFile = '.env'
 dotenv.config({ path: envFile })
