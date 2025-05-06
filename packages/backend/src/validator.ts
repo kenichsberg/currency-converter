@@ -1,12 +1,12 @@
 import { Request, Response, NextFunction } from 'express'
-import z from 'zod'
-import { StrictZodObject, parseWithSchema } from 'common/dist/index.js'
+import z, { ZodTypeAny } from 'zod'
+import { parseWithSchema } from 'common/dist/index.js'
 
 type Schema<
-  Query extends StrictZodObject,
-  Body extends StrictZodObject,
-  Params extends StrictZodObject,
-  Headers extends StrictZodObject,
+  Query extends ZodTypeAny,
+  Body extends ZodTypeAny,
+  Params extends ZodTypeAny,
+  Headers extends ZodTypeAny,
 > = {
   querySchema: Query
   bodySchema: Body
@@ -15,10 +15,10 @@ type Schema<
 }
 
 function validateRoute<
-  Query extends StrictZodObject,
-  Body extends StrictZodObject,
-  Params extends StrictZodObject,
-  Headers extends StrictZodObject,
+  Query extends ZodTypeAny,
+  Body extends ZodTypeAny,
+  Params extends ZodTypeAny,
+  Headers extends ZodTypeAny,
 >(schema: Schema<Query, Body, Params, Headers>) {
   return (req: Request<any>, res: Response, next: NextFunction) => {
     try {
@@ -46,7 +46,7 @@ function validateRoute<
       next()
     } catch (error) {
       if (error instanceof z.ZodError) {
-        console.error(error.errors)
+        console.error(error)
         res.status(400).json(error.errors)
         return
       }
@@ -59,10 +59,10 @@ function validateRoute<
 }
 
 function resolveParsedRequestTypes<
-  Query extends StrictZodObject,
-  Body extends StrictZodObject,
-  Params extends StrictZodObject,
-  Headers extends StrictZodObject,
+  Query extends ZodTypeAny,
+  Body extends ZodTypeAny,
+  Params extends ZodTypeAny,
+  Headers extends ZodTypeAny,
 >(_: Schema<Query, Body, Params, Headers>) {
   return (req: Request) => {
     return {

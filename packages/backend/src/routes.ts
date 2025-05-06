@@ -2,7 +2,7 @@ import { Router, Request, Response } from 'express'
 import dotenv from 'dotenv'
 import z from 'zod'
 import { validateRoute } from './validator.js'
-import { CURRENCY_CODES } from 'common/dist/index.js'
+import { CURRENCY_CODES, ConvertRes } from 'common/dist/index.js'
 
 const envFile = '.env'
 dotenv.config({ path: envFile })
@@ -16,18 +16,8 @@ swopHeaders.append('Authorization', `ApiKey ${process.env.SWOP_API_KEY}`)
 type ConvertParams = {
   from: string
   to: string
-  amount: number
+  amount: string
 }
-type ConvertRes =
-  | {
-      fromCurrency: string
-      toCurrency: string
-      rate: number
-      date: string
-      fromAmount: number
-      toAmount: number
-    }
-  | { message: any }
 type Empty = {}
 
 type SwopRes = {
@@ -37,7 +27,6 @@ type SwopRes = {
   date: string
 }
 
-// TODO apply fetcher style
 async function getJSON<T>(config: {
   url: string
   method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'
@@ -50,25 +39,30 @@ async function getJSON<T>(config: {
 const convertSchema = {
   querySchema: z.strictObject({}),
   bodySchema: z.strictObject({}),
-  paramsSchema: z.strictObject({
-    from: z.enum(CURRENCY_CODES),
-    to: z.enum(CURRENCY_CODES),
-    amount: z.number().positive(),
-  }),
-  headerSchema: z.strictObject({}),
+  paramsSchema: z
+    .strictObject({
+      from: z
+        .enum(CURRENCY_CODES, { message: 'Invalid currency code' })
+        .refine((data) => data === 'EUR', {
+          message:
+            "The only supported from currency is 'EUR'. Other currencies can not be converted.",
+        }),
+      to: z.enum(CURRENCY_CODES, { message: 'Invalid currency code' }),
+    })
+    .refine((data) => data.from !== data.to, {
+      message: 'Same currency codes',
+      path: ['to'],
+    }),
+  headerSchema: z.object({}),
 }
 
 router.get<ConvertParams, ConvertRes, Empty, Empty>(
-  '/convert/:from/:to/:amount',
+  '/convert/:from/:to',
   validateRoute(convertSchema),
   async (req, res, _) => {
-    //const amount = parseFloat(req.params.amount)
-    //if (isNaN(amount)) return res.send(400)
-    //const { params } = resolveParsedRequestTypes(convertSchema)(req)
-    const { from, to, amount } = req.params as unknown as { from: string; to: string; amount: number }
-    if (from !== 'EUR') {
-      res.status(400).json({ message: '' })
-      return
+    const { from, to } = req.params as unknown as {
+      from: string
+      to: string
     }
 
     let swopRes = await getJSON<SwopRes>({
@@ -77,22 +71,15 @@ router.get<ConvertParams, ConvertRes, Empty, Empty>(
       headers: swopHeaders,
     })
     if (swopRes.quote === null) {
-      res.status(400).json({ message: swopRes })
+      res.status(422).json({ message: 'Request could not be processed.' })
       return
     }
-
-    //console.log('swopRes: ', swopRes)
-    //const rate = swopRes.quote
-    //console.log(typeof rate)
-    //if (typeof rate !== 'number') return res.send(400)
 
     res.json({
       fromCurrency: swopRes.base_currency,
       toCurrency: swopRes.quote_currency,
       rate: swopRes.quote,
       date: swopRes.date,
-      fromAmount: amount,
-      toAmount: amount * swopRes.quote,
     })
   },
 )

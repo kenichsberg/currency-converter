@@ -9,9 +9,12 @@
   ],
   "scripts": {
     "build:common": "cd lib/common && npm run build",
-    "dev:backend": "cd packages/backend && npm run build && npm run start",
+    "build:backend": "cd packages/backend && npm run build",
+    "build-all": "run-p build:*",
+    "dev:backend": "cd packages/backend && npm run dev",
     "dev:frontend": "cd packages/frontend && npm run dev",
-    "dev": "npm run build:common && run-p dev:*"
+    "dev-all": "run-p dev:*",
+    "dev": "run-s build-all dev-all"
   },
   "volta": {
     "node": "22.14.0",

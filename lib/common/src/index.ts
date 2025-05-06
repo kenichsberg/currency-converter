@@ -1,15 +1,19 @@
 import z, { ZodIssueCode } from 'zod'
-import type { ZodObject, ZodRawShape } from 'zod'
+import type { ZodObject, ZodRawShape, ZodTypeAny } from 'zod'
 
 type StrictZodObject = ZodObject<ZodRawShape, 'strict'>
 
-type parseWithSchemaType<Schema extends StrictZodObject> = {
+type parseWithSchemaType<Schema extends ZodTypeAny> = {
   data: unknown
   schema: Schema
   errorMessage?: string
 }
 
-function parseWithSchema<Schema extends StrictZodObject>({ data, schema, errorMessage }: parseWithSchemaType<Schema>) {
+function parseWithSchema<Schema extends ZodTypeAny>({
+  data,
+  schema,
+  errorMessage,
+}: parseWithSchemaType<Schema>) {
   return schema.parse(data, {
     errorMap: (error, ctx) => {
       if (error.code === ZodIssueCode.unrecognized_keys && errorMessage) {
@@ -214,5 +218,16 @@ const CURRENCY_CODES = [
   'ZWR',
 ] as const
 
-export type { StrictZodObject }
+type ConvertResSuccess = {
+  fromCurrency: string
+  toCurrency: string
+  rate: number
+  date: string
+}
+type SimpleMessageRes = {
+  message: string
+}
+type ConvertRes = ConvertResSuccess | SimpleMessageRes
+
+export type { StrictZodObject, ConvertRes, ConvertResSuccess, SimpleMessageRes }
 export { parseWithSchema, CURRENCY_CODES }

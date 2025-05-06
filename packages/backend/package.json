@@ -5,7 +5,7 @@
   "main": "server.js",
   "scripts": {
     "build": "tsc -b",
-    "dev": "tsx src/server.ts",
+    "dev": "tsx watch src/server.ts",
     "start": "node dist/server.js",
     "lint": "eslint . --ext .ts",
     "format": "prettier --write .",
